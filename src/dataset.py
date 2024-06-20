@@ -154,7 +154,7 @@ def drop_nan_columns(df):
     return df
 
 def resample_image_sitk(dataset_path, file_list, target_shape, target_spacing):
-    resampled_images = {}
+    resampled_images = []
     for i, nii_file in enumerate(file_list):
         if i == 3:
             break
@@ -173,37 +173,41 @@ def resample_image_sitk(dataset_path, file_list, target_shape, target_spacing):
         # save new nii file
         output_path = f"{nii_file}_sitk_{i}.nii"
         sitk.WriteImage(resampled_data, os.path.join(dataset_path, output_path))
-
-    return resampled_images
-def resample_images(dataset_path, file_list, target_shape, target_spacing):
-    resampled_images = {}
-    for i, nii_file in enumerate(file_list):
-        if i == 3:
-            break
-        # get affine matrix
-        image, original_affine = get_affine(os.path.join(dataset_path, nii_file))
-
-        original_spacing = np.sqrt(np.sum(original_affine[:3, :3]**2, axis=0))
-
-        # resample the image
-        resampled_data = resample_image(image= image, target_shape= target_shape,
-                                         target_spacing= target_spacing, original_affine= original_affine)
-
-        # update the affine matrix
-        new_affine = update_affine(original_affine= original_affine,
-                                   original_spacing= original_spacing,
-                                   target_spacing= target_spacing)
-
-        resampled_image = nib.Nifti1Image(resampled_data, new_affine)
-        # save new nii file
-        output_path = f"{nii_file}_{i}.nii"
-        nib.save(resampled_image, os.path.join(dataset_path, output_path))
         
-        # save the resampled image to the dict
-        resampled_images[output_path] = resampled_data
-        # save_nii(data= resampled_image, affine= new_affine, output_path= os.path.join(dataset_path,output_path))
+        # save the file path to the list
+        resampled_images.append(os.path.join(dataset_path, output_path))
 
     return resampled_images
+
+# def resample_images(dataset_path, file_list, target_shape, target_spacing):
+#     resampled_images = {}
+#     for i, nii_file in enumerate(file_list):
+#         if i == 3:
+#             break
+#         # get affine matrix
+#         image, original_affine = get_affine(os.path.join(dataset_path, nii_file))
+
+#         original_spacing = np.sqrt(np.sum(original_affine[:3, :3]**2, axis=0))
+
+#         # resample the image
+#         resampled_data = resample_image(image= image, target_shape= target_shape,
+#                                          target_spacing= target_spacing, original_affine= original_affine)
+
+#         # update the affine matrix
+#         new_affine = update_affine(original_affine= original_affine,
+#                                    original_spacing= original_spacing,
+#                                    target_spacing= target_spacing)
+
+#         resampled_image = nib.Nifti1Image(resampled_data, new_affine)
+#         # save new nii file
+#         output_path = f"{nii_file}_{i}.nii"
+#         nib.save(resampled_image, os.path.join(dataset_path, output_path))
+        
+#         # save the resampled image to the dict
+#         resampled_images[output_path] = resampled_data
+#         # save_nii(data= resampled_image, affine= new_affine, output_path= os.path.join(dataset_path,output_path))
+
+#     return resampled_images
 
 def resample_image(image, target_shape, original_affine, target_spacing, file_ext=".nii"):
     original_spacing = np.sqrt(np.sum(original_affine[:3, :3]**2, axis=0))
