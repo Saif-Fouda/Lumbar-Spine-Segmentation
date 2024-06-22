@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.ndimage import zoom
 import torchio as tio
+from torch.utils.data import DataLoader, Dataset
 import torch
 
 # Constants for the dataset
@@ -19,9 +20,9 @@ PHILIPS_HEALTHCARE = "Philips Healthcare"
 PHILIPS_MEDICAL_SYSTEM = "Philips Medical Systems"
 
 # target spacing
-TARGET_SPACING = (1.0, 1.0, 1.0)
+# TARGET_SPACING = (0.8, 0.8, 0.8)
 # target shape
-TARGET_SHAPE = (256, 256, 256)
+TARGET_SHAPE = (128, 128, 128)
 
 # Preprocess the data
 
@@ -153,93 +154,98 @@ def drop_nan_columns(df):
     df = df.dropna(axis=1)
     return df
 
-def resample_image_sitk(dataset_path, file_list, target_shape, target_spacing):
+def resample_image_sitk(dataset_path, file_list, target_shape):
     resampled_images = []
     for i, nii_file in enumerate(file_list):
-        if i == 3:
+        if i == 15:
             break
-        # get affine matrix
-        image = sitk_read_image(os.path.join(dataset_path, nii_file))
         
-        resampler = sitk.ResampleImageFilter()
-        resampler.SetOutputSpacing(target_spacing)
-        resampler.SetSize(target_shape)
-        resampler.SetOutputDirection(image.GetDirection())
-        resampler.SetOutputOrigin(image.GetOrigin())
-        resampler.SetInterpolator(sitk.sitkLinear)
-        
-        resampled_data = resampler.Execute(image)
-        
-        # save new nii file
+        # Set the output path
         output_path = f"{nii_file}_sitk_{i}.nii"
-        sitk.WriteImage(resampled_data, os.path.join(dataset_path, output_path))
         
-        # save the file path to the list
-        resampled_images.append(os.path.join(dataset_path, output_path))
+        # Check if the file already exists
+        if check_file_exists(dataset_path, output_path):
+            resampled_images.append(os.path.join(dataset_path, output_path))
+        else:
+            # Read the image and get the original spacing and size
+            image, original_spacing, original_size = sitk_read_image(os.path.join(dataset_path, nii_file))
+            # print(f'Original spacing: {original_spacing}')
+            # print(f'Original size: {original_size}')
+            
+            # Calculate new spacing
+            new_spacing = [original_spacing[i] * (original_size[i] / target_shape[i]) for i in range(len(target_shape))]
+            # print(f'New spacing: {new_spacing}')
+
+            # Center the resampled image
+            original_origin = image.GetOrigin()
+            original_center = [original_origin[i] + original_spacing[i] * original_size[i] / 2.0 for i in range(3)]
+            new_origin = [original_center[i] - new_spacing[i] * target_shape[i] / 2.0 for i in range(3)]
+            
+            # Create a resampler
+            resampler = sitk.ResampleImageFilter()
+            resampler.SetOutputSpacing(new_spacing)
+            resampler.SetSize(target_shape)
+            resampler.SetOutputOrigin(new_origin)
+            resampler.SetInterpolator(sitk.sitkBSpline5)  # Use B-Spline interpolation for high quality
+
+            # Set the default pixel value to zero (background)
+            resampler.SetDefaultPixelValue(0)
+            
+            # Resample the image
+            resampled_image = resampler.Execute(image)
+            
+            # Normalize the voxel values to the range (0, 255)
+            normalized_image = normalize_image(resampled_image)
+            
+            # save new nii file
+            sitk.WriteImage(normalized_image, os.path.join(dataset_path, output_path))
+            
+            # save the file path to the list
+            resampled_images.append(os.path.join(dataset_path, output_path))
 
     return resampled_images
 
-# def resample_images(dataset_path, file_list, target_shape, target_spacing):
-#     resampled_images = {}
-#     for i, nii_file in enumerate(file_list):
-#         if i == 3:
-#             break
-#         # get affine matrix
-#         image, original_affine = get_affine(os.path.join(dataset_path, nii_file))
-
-#         original_spacing = np.sqrt(np.sum(original_affine[:3, :3]**2, axis=0))
-
-#         # resample the image
-#         resampled_data = resample_image(image= image, target_shape= target_shape,
-#                                          target_spacing= target_spacing, original_affine= original_affine)
-
-#         # update the affine matrix
-#         new_affine = update_affine(original_affine= original_affine,
-#                                    original_spacing= original_spacing,
-#                                    target_spacing= target_spacing)
-
-#         resampled_image = nib.Nifti1Image(resampled_data, new_affine)
-#         # save new nii file
-#         output_path = f"{nii_file}_{i}.nii"
-#         nib.save(resampled_image, os.path.join(dataset_path, output_path))
-        
-#         # save the resampled image to the dict
-#         resampled_images[output_path] = resampled_data
-#         # save_nii(data= resampled_image, affine= new_affine, output_path= os.path.join(dataset_path,output_path))
-
-#     return resampled_images
-
-def resample_image(image, target_shape, original_affine, target_spacing, file_ext=".nii"):
-    original_spacing = np.sqrt(np.sum(original_affine[:3, :3]**2, axis=0))
-    zoom_factors = np.array(target_shape) / np.array(image.shape)
-    resampled_data = zoom(image, zoom_factors, order=1)  # Linear interpolation
-
-    # resample using torchio
-    # resample_transform = tio.Resample(target_spacing)
-    # resampled_image = resample_transform(image)
-
-    # resize_transform = tio.Resize(target_shape)
-    # resized_image = resize_transform(resampled_image)
-    return resampled_data
-
-def update_affine(original_affine, original_spacing, target_spacing):
-    new_affine = original_affine.copy()
-    for i in range(3):
-        new_affine[i, i] = target_spacing[i]
-    return new_affine
-
-def save_nii(data, affine, output_path):
-    new_img = nib.Nifti1Image(data, affine)
-    nib.save(new_img, output_path)
-    print(f"Saved resampled image to {output_path}")
-
-def get_affine(file_path, file_ext=".nii"):
-    file_path = file_path + file_ext
-    image = nib.load(file_path).get_fdata()
-    affine = nib.load(file_path).affine
-    return image, affine
-
+def check_file_exists(dataset_path, output_path):
+    if os.path.exists(os.path.join(dataset_path, output_path)):
+        return True
+    return False
+    
 def sitk_read_image(file_path, file_ext=".nii"):
     file_path = file_path + file_ext
+    # Read the image
     image = sitk.ReadImage(file_path)
-    return image
+    
+    # Cast the image to float32
+    image = sitk.Cast(image, sitk.sitkFloat32)
+    
+    # Get the spacing and size of the image
+    original_spacing = image.GetSpacing()
+    original_size = image.GetSize()
+    
+    return image, original_spacing, original_size
+
+# Normalize the voxel values to the range (0, 255)
+def normalize_image(image):
+    image_array = sitk.GetArrayFromImage(image)
+    
+    # Find minimum and maximum values in the image
+    min_val = np.min(image_array)
+    max_val = np.max(image_array)
+    
+    # Shift the range to start from 0
+    image_array = image_array - min_val
+    
+    # Scale to the range (0, 255)
+    if max_val != min_val:  # Avoid division by zero
+        image_array = (image_array / (max_val - min_val)) * 255.0
+    
+    # Clip values to ensure they are within (0, 255)
+    image_array = np.clip(image_array, 0, 255)
+    
+    # Convert back to SimpleITK image
+    normalized_image = sitk.GetImageFromArray(image_array.astype(np.uint8))
+    normalized_image.SetSpacing(image.GetSpacing())
+    normalized_image.SetOrigin(image.GetOrigin())
+    normalized_image.SetDirection(image.GetDirection())
+    
+    return normalized_image
