@@ -22,7 +22,7 @@ PHILIPS_MEDICAL_SYSTEM = "Philips Medical Systems"
 # target spacing
 # TARGET_SPACING = (0.8, 0.8, 0.8)
 # target shape
-TARGET_SHAPE = (128, 128, 128)
+TARGET_SHAPE = (64, 128, 128)
 
 # Preprocess the data
 
@@ -157,7 +157,7 @@ def drop_nan_columns(df):
 def resample_image_sitk(dataset_path, file_list, target_shape):
     resampled_images = []
     for i, nii_file in enumerate(file_list):
-        if i == 15:
+        if i == 3:
             break
         
         # Set the output path
