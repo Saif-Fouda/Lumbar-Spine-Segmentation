@@ -1,0 +1,123 @@
+{
+    "name": "Lumbar Spine Segmentation",
+    "description": "Segmentation of vertebrae, intervertebral discs, and spinal canal in lumbar spine MRI",
+    "reference": "Lumbar SPIDER Challenge",
+    "licence": "CC-BY-SA 4.0",
+    "release": "0.0",
+    "tensorImageSize": "4D",
+    "modality": {
+        "0": "MRI_T1",
+        "1": "MRI_T2"
+    },
+    "labels": {
+        "0": "background",
+        "1": "vertebrae",
+        "2": "intervertebral discs",
+        "3": "spinal canal"
+    },
+    "channel_names": {
+        "0": "T1",
+        "1": "T2"
+    },
+    "numTraining": 10,
+    "numTest": 3,
+    "file_ending": ".nii.gz",
+    "training": [
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_001_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_001_0001.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTr/BRATS_001.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_002_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_002_0001.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTr/BRATS_002.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_003_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_003_0001.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTr/BRATS_003.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_004_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_004_0001.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTr/BRATS_004.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_005_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_005_0001.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTr/BRATS_005.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_006_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_006_0001.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTr/BRATS_006.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_007_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_007_0001.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTr/BRATS_007.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_008_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_008_0001.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTr/BRATS_008.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_009_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_009_0001.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTr/BRATS_009.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_010_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTr/BRATS_010_0001.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTr/BRATS_010.nii.gz"
+        }
+    ],
+    "test": [
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTs/BRATS_011_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTs/BRATS_011_0001.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTs/BRATS_011_0002.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTs/BRATS_011.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTs/BRATS_012_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTs/BRATS_012_0001.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTs/BRATS_012_0002.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTs/BRATS_012.nii.gz"
+        },
+        {
+            "image": [
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTs/BRATS_013_0000.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTs/BRATS_013_0001.nii.gz",
+                "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/imagesTs/BRATS_013_0002.nii.gz"
+            ],
+            "label": "/Users/saiffouda/WorkingSpace_code/DL/Project/Structure/nnUNet_raw/Dataset001_LumbarSpine/labelsTs/BRATS_013.nii.gz"
+        }
+    ]
+}
