@@ -55,6 +55,17 @@ def load_convert_mha(file_path, file_ext=".mha"):
 
     return nii_file, nii_array
 
+def convert_mha_to_nii(mha_file, nii_file):
+    image = sitk.ReadImage(mha_file)
+    sitk.WriteImage(image, nii_file)
+
+def batch_convert_mha_to_nii(directory):
+    for filename in os.listdir(directory):
+        if filename.endswith(".mha"):
+            mha_file = os.path.join(directory, filename)
+            nii_file = os.path.join(directory, os.path.splitext(filename)[0] + ".nii")
+            convert_mha_to_nii(mha_file, nii_file)
+            print(f"Converted {mha_file} to {nii_file}")
 
 def extract_sagittal_view(nii_file,img_array):
     # Load the nii file
@@ -154,54 +165,51 @@ def drop_nan_columns(df):
     df = df.dropna(axis=1)
     return df
 
-def resample_image_sitk(dataset_path, file_list, target_shape):
+
+def resample_image_sitk(dataset_path, file_list, target_shape, files_number=10):
     resampled_images = []
     for i, nii_file in enumerate(file_list):
-        if i == 3:
+        if i == files_number:
             break
         
         # Set the output path
         output_path = f"{nii_file}_sitk_{i}.nii"
         
-        # Check if the file already exists
-        if check_file_exists(dataset_path, output_path):
-            resampled_images.append(os.path.join(dataset_path, output_path))
-        else:
-            # Read the image and get the original spacing and size
-            image, original_spacing, original_size = sitk_read_image(os.path.join(dataset_path, nii_file))
-            # print(f'Original spacing: {original_spacing}')
-            # print(f'Original size: {original_size}')
-            
-            # Calculate new spacing
-            new_spacing = [original_spacing[i] * (original_size[i] / target_shape[i]) for i in range(len(target_shape))]
-            # print(f'New spacing: {new_spacing}')
+        # Read the image and get the original spacing and size
+        image, original_spacing, original_size = sitk_read_image(os.path.join(dataset_path, nii_file))
+        # print(f'Original spacing: {original_spacing}')
+        # print(f'Original size: {original_size}')
+        
+        # Calculate new spacing
+        new_spacing = [original_spacing[i] * (original_size[i] / target_shape[i]) for i in range(len(target_shape))]
+        # print(f'New spacing: {new_spacing}')
 
-            # Center the resampled image
-            original_origin = image.GetOrigin()
-            original_center = [original_origin[i] + original_spacing[i] * original_size[i] / 2.0 for i in range(3)]
-            new_origin = [original_center[i] - new_spacing[i] * target_shape[i] / 2.0 for i in range(3)]
-            
-            # Create a resampler
-            resampler = sitk.ResampleImageFilter()
-            resampler.SetOutputSpacing(new_spacing)
-            resampler.SetSize(target_shape)
-            resampler.SetOutputOrigin(new_origin)
-            resampler.SetInterpolator(sitk.sitkBSpline5)  # Use B-Spline interpolation for high quality
+        # Center the resampled image
+        original_origin = image.GetOrigin()
+        original_center = [original_origin[i] + original_spacing[i] * original_size[i] / 2.0 for i in range(3)]
+        new_origin = [original_center[i] - new_spacing[i] * target_shape[i] / 2.0 for i in range(3)]
+        
+        # Create a resampler
+        resampler = sitk.ResampleImageFilter()
+        resampler.SetOutputSpacing(new_spacing)
+        resampler.SetSize(target_shape)
+        resampler.SetOutputOrigin(new_origin)
+        resampler.SetInterpolator(sitk.sitkBSpline5)  # Use B-Spline interpolation for high quality
 
-            # Set the default pixel value to zero (background)
-            resampler.SetDefaultPixelValue(0)
-            
-            # Resample the image
-            resampled_image = resampler.Execute(image)
-            
-            # Normalize the voxel values to the range (0, 255)
-            normalized_image = normalize_image(resampled_image)
-            
-            # save new nii file
-            sitk.WriteImage(normalized_image, os.path.join(dataset_path, output_path))
-            
-            # save the file path to the list
-            resampled_images.append(os.path.join(dataset_path, output_path))
+        # Set the default pixel value to zero (background)
+        resampler.SetDefaultPixelValue(0)
+        
+        # Resample the image
+        resampled_image = resampler.Execute(image)
+        
+        # Normalize the voxel values to the range (0, 255)
+        normalized_image = normalize_image(resampled_image)
+        
+        # save new nii file
+        sitk.WriteImage(normalized_image, os.path.join(dataset_path, output_path))
+        
+        # save the file path to the list
+        resampled_images.append(os.path.join(dataset_path, output_path))
 
     return resampled_images
 

@@ -164,3 +164,4 @@ cython_debug/
 # inputs 
 *.nii
 *.nii.gz
+*.mha
